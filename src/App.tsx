@@ -7,6 +7,7 @@ import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
 import ServicesPage from './pages/ServicesPage';
 import TransportationPage from './pages/TransportationPage';
+import SmartTransitPage from './pages/SmartTransitPage';
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -19,6 +20,7 @@ function AnimatedRoutes() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/transportation" element={<TransportationPage />} />
+        <Route path="/pothole-detection" element={<SmartTransitPage />} />
       </Routes>
     </AnimatePresence>
   );

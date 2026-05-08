@@ -117,7 +117,10 @@ export default function TransportationPage() {
                   ))}
                 </div>
 
-                <button className="btn-primary w-full py-3 flex items-center justify-center gap-2 group/btn">
+                <button 
+                  onClick={() => feature.title === "Pothole & Road Damage Reporting" ? navigate('/pothole-detection') : null}
+                  className="btn-primary w-full py-3 flex items-center justify-center gap-2 group/btn"
+                >
                   Explore Module
                   <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
                 </button>
