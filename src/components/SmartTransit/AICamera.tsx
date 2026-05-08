@@ -1,6 +1,7 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
+import Webcam from 'react-webcam';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, ShieldAlert, Cpu, Radio, Maximize2 } from 'lucide-react';
+import { Camera, ScanLine } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 interface AICameraProps {
@@ -9,117 +10,126 @@ interface AICameraProps {
 }
 
 export default function AICamera({ isScanning, detections }: AICameraProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const [fps, setFps] = useState(60);
+  const webcamRef = useRef<Webcam>(null);
 
-  useEffect(() => {
-    if (isScanning) {
-      navigator.mediaDevices.getUserMedia({ video: true })
-        .then(s => {
-          setStream(s);
-          if (videoRef.current) videoRef.current.srcObject = s;
-        })
-        .catch(err => console.error("Camera access denied:", err));
-    } else {
-      stream?.getTracks().forEach(track => track.stop());
-      setStream(null);
-    }
-    return () => stream?.getTracks().forEach(track => track.stop());
-  }, [isScanning]);
+  const videoConstraints = {
+    width: 1280,
+    height: 720,
+    facingMode: "environment", // STRICTLY USE REAR/ROAD CAMERA
+  };
 
   return (
-    <div className="cyber-card group !p-0">
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
-        <Camera size={18} className="text-cyan-400" />
-        <h3 className="font-display font-bold text-xs uppercase tracking-widest">AI Vision Feed</h3>
-        {isScanning && (
-          <div className="flex items-center gap-2 px-2 py-0.5 glass rounded-full border-red-500/30">
-            <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-[8px] font-mono font-bold text-red-400">REC 4K</span>
+    <div className="cyber-card relative overflow-hidden group h-full">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-4 relative z-10">
+        <div className="flex items-center gap-2">
+          <div className={cn(
+            "p-2 rounded-lg",
+            isScanning ? "bg-cyan-500/20 text-cyan-400" : "bg-white/5 text-white/40"
+          )}>
+            <ScanLine size={16} />
           </div>
-        )}
+          <div>
+            <h3 className="font-display font-bold text-sm">Road Surface Scanner</h3>
+            <span className="text-[8px] font-mono text-white/30 uppercase tracking-widest">Rear-Cam-02</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 px-2 py-0.5 glass rounded-md border-cyan-500/30">
+            <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse", isScanning ? "bg-cyan-500" : "bg-red-500")} />
+            <span className="text-[8px] font-mono text-white/40 uppercase tracking-widest">
+              {isScanning ? "Road-AI Active" : "Standby"}
+            </span>
+          </div>
+        </div>
       </div>
 
-      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
-        <div className="glass px-2 py-0.5 rounded-md text-[8px] font-mono text-cyan-400">FPS: {fps}</div>
-        <button className="p-1 glass rounded-md hover:neon-border transition-all">
-          <Maximize2 size={12} />
-        </button>
-      </div>
+      {/* Camera Feed Container */}
+      <div className="relative aspect-video rounded-2xl overflow-hidden border border-white/5 bg-black">
+        <Webcam
+          audio={false}
+          ref={webcamRef}
+          screenshotFormat="image/jpeg"
+          videoConstraints={videoConstraints}
+          className="w-full h-full object-cover grayscale-[0.2] brightness-90"
+        />
 
-      <div className="relative aspect-video bg-black rounded-3xl overflow-hidden border border-white/5">
-        {isScanning ? (
-          <>
-            <video 
-              ref={videoRef} 
-              autoPlay 
-              playsInline 
-              muted 
-              className="w-full h-full object-cover opacity-80 scale-105 transition-transform duration-500"
-            />
-            {/* AI HUD Overlays */}
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="scanner-line" />
-              
-              {/* Corner Brackets */}
-              <div className="absolute top-8 left-8 w-8 h-8 border-t-2 border-l-2 border-cyan-500/50" />
-              <div className="absolute top-8 right-8 w-8 h-8 border-t-2 border-r-2 border-cyan-500/50" />
-              <div className="absolute bottom-8 left-8 w-8 h-8 border-b-2 border-l-2 border-cyan-500/50" />
-              <div className="absolute bottom-8 right-8 w-8 h-8 border-b-2 border-r-2 border-cyan-500/50" />
+        {/* AI Overlays */}
+        <AnimatePresence>
+          {isScanning && (
+            <>
+              {/* Scan Line Animation */}
+              <motion.div 
+                initial={{ top: 0 }}
+                animate={{ top: '100%' }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                className="absolute left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent z-20 shadow-[0_0_15px_rgba(0,229,255,0.8)]"
+              />
 
-              {/* Detections Overlay */}
-              <AnimatePresence>
-                {detections.map((d, i) => (
-                  <motion.div
-                    key={d.id}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute border-2 border-red-500 bg-red-500/10 rounded-lg shadow-[0_0_20px_rgba(239,68,68,0.3)]"
-                    style={{
-                      top: '30%',
-                      left: '40%',
-                      width: '120px',
-                      height: '80px',
-                    }}
+              {/* HUD Elements */}
+              <div className="absolute inset-0 pointer-events-none p-4 font-mono">
+                {/* Corners */}
+                <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-cyan-400/50" />
+                <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-cyan-400/50" />
+                <div className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-cyan-400/50" />
+                <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-cyan-400/50" />
+
+                {/* Telemetry */}
+                <div className="absolute top-8 left-8 space-y-1 text-[8px] text-cyan-400/60 uppercase tracking-tighter">
+                  <div>SENSOR: REAR_ARRAY</div>
+                  <div>FACING: ENVIRONMENT</div>
+                  <div>FPS: 60.0</div>
+                </div>
+
+                {/* Detection Box Simulation */}
+                {detections.map((det) => (
+                  <motion.div 
+                    key={det.id}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className={cn(
+                      "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-32 border-2",
+                      det.severity === 'Dangerous' || det.severity === 'High' ? "border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.4)]" : "border-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.4)]"
+                    )}
                   >
-                    <div className="absolute -top-6 left-0 bg-red-500 text-white text-[8px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-widest flex items-center gap-1">
-                      <ShieldAlert size={8} />
-                      Pothole Detected: {d.severity}
-                    </div>
-                    <div className="absolute -bottom-5 right-0 text-[8px] font-mono text-red-400 font-bold">
-                      CONF: {d.confidence}%
+                    <div className={cn(
+                      "absolute -top-6 left-0 px-2 py-0.5 rounded-sm text-[8px] font-bold uppercase",
+                      det.severity === 'Dangerous' || det.severity === 'High' ? "bg-red-500 text-white" : "bg-yellow-400 text-black"
+                    )}>
+                      Surface {det.severity}: {det.confidence}%
                     </div>
                   </motion.div>
                 ))}
-              </AnimatePresence>
-
-              {/* Radar Animation */}
-              <div className="absolute bottom-4 left-4 w-12 h-12 glass rounded-full border-cyan-500/30 overflow-hidden">
-                <div className="absolute inset-0 bg-[conic-gradient(from_0deg,#00E5FF_0deg,transparent_90deg)] animate-[spin_4s_linear_infinite] opacity-30" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Radio size={12} className="text-cyan-400/50" />
-                </div>
               </div>
-            </div>
-          </>
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#06142E]/80">
-            <div className="p-4 glass rounded-3xl border-white/5 animate-float">
-              <Cpu size={40} className="text-white/10" />
-            </div>
-            <div className="text-center">
-              <div className="text-[10px] font-mono uppercase tracking-widest text-white/30">Camera Status</div>
-              <div className="text-xs font-bold text-white/50">STANDBY MODE</div>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Status Text Overlay */}
+        {!isScanning && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div className="text-center space-y-4">
+              <Camera size={40} className="mx-auto text-white/20 animate-pulse" />
+              <p className="text-[10px] uppercase tracking-widest text-white/40">Securing Road Feed...</p>
             </div>
           </div>
         )}
+      </div>
 
-        {/* Global HUD Text */}
-        <div className="absolute bottom-4 left-20 z-20 flex flex-col gap-1">
-          <div className="text-[8px] font-mono text-cyan-400/50 uppercase tracking-tighter">LAT: 12.9716° N</div>
-          <div className="text-[8px] font-mono text-cyan-400/50 uppercase tracking-tighter">LON: 77.5946° E</div>
+      {/* Footer Info */}
+      <div className="mt-4 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+           <div className="flex items-center gap-1.5">
+             <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+             <span className="text-[10px] font-bold text-white/80">RoadAI Core</span>
+           </div>
+           <div className="flex items-center gap-1.5">
+             <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
+             <span className="text-[10px] text-white/30 uppercase tracking-tighter">ENVIRONMENT_SCAN_ONLY</span>
+           </div>
+        </div>
+        <div className="flex items-center gap-2 text-[10px] text-cyan-400 font-mono italic">
+           PRIVACY_SHIELD_ACTIVE
         </div>
       </div>
     </div>

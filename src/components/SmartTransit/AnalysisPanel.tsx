@@ -12,34 +12,42 @@ export default function AnalysisPanel({ lastDetection }: AnalysisPanelProps) {
     return (
       <div className="cyber-card h-full flex flex-col items-center justify-center text-white/10 gap-4">
         <Cpu size={48} className="opacity-20 animate-pulse" />
-        <p className="text-[10px] uppercase tracking-widest text-center font-mono">Standby for AI<br/>Surface Analysis</p>
+        <p className="text-[10px] uppercase tracking-widest text-center font-mono">Standby for AI<br/>Road Surface Analysis</p>
       </div>
     );
   }
 
-  const severityColor = lastDetection.severity === 'High' ? 'text-red-400' : 'text-yellow-400';
-  const severityBg = lastDetection.severity === 'High' ? 'bg-red-500/20' : 'bg-yellow-500/20';
+  const getSeverityStyles = (severity: string) => {
+    switch (severity) {
+      case 'Dangerous': return { color: 'text-red-500', bg: 'bg-red-500/20' };
+      case 'High': return { color: 'text-orange-500', bg: 'bg-orange-500/20' };
+      case 'Medium': return { color: 'text-yellow-400', bg: 'bg-yellow-400/20' };
+      default: return { color: 'text-cyan-400', bg: 'bg-cyan-400/20' };
+    }
+  };
+
+  const { color, bg } = getSeverityStyles(lastDetection.severity);
 
   return (
     <div className="cyber-card h-full space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Cpu size={18} className="text-cyan-400" />
-          <h3 className="font-display font-bold text-sm">AI Analysis</h3>
+          <h3 className="font-display font-bold text-sm">Road Damage AI</h3>
         </div>
-        <div className={cn("px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest", severityBg, severityColor)}>
-          {lastDetection.severity} Risk
+        <div className={cn("px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest", bg, color)}>
+          {lastDetection.severity} RISK
         </div>
       </div>
 
       {/* Main Metrics */}
       <div className="grid grid-cols-2 gap-4">
         <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-1">
-          <div className="text-[8px] uppercase tracking-widest text-white/30">Est. Depth</div>
+          <div className="text-[8px] uppercase tracking-widest text-white/30">Crack Depth</div>
           <div className="text-xl font-mono font-bold text-cyan-400">12.5 <span className="text-[10px] text-white/20">CM</span></div>
         </div>
         <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-1">
-          <div className="text-[8px] uppercase tracking-widest text-white/30">Est. Width</div>
+          <div className="text-[8px] uppercase tracking-widest text-white/30">Width Est.</div>
           <div className="text-xl font-mono font-bold text-cyan-400">45.0 <span className="text-[10px] text-white/20">CM</span></div>
         </div>
       </div>
@@ -62,14 +70,14 @@ export default function AnalysisPanel({ lastDetection }: AnalysisPanelProps) {
 
         <div className="space-y-2">
           <div className="flex justify-between items-center text-[9px] uppercase tracking-widest text-white/40">
-            <span>Repair Urgency</span>
-            <span className="text-cyan-400 font-bold">CRITICAL</span>
+            <span>Accident Probability</span>
+            <span className="text-orange-500 font-bold">92%</span>
           </div>
           <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: '92%' }}
-              className="h-full bg-cyan-400"
+              className="h-full bg-orange-500"
             />
           </div>
         </div>
