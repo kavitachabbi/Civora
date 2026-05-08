@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-primary-dark: #06142E;
+  --color-cyan-vibrant: #00E5FF;
+  --color-purple-vibrant: #8B5CF6;
+}
+
+@layer base {
+  body {
+    @apply bg-[#06142E] text-white selection:bg-cyan-400/30 overflow-x-hidden;
+  }
+}
+
+/* Custom Utilities using standard CSS and Tailwind @apply where safe */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-glow {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  transition: all 0.5s ease-in-out;
+}
+
+.glass-glow:hover {
+  border-color: rgba(0, 229, 255, 0.4);
+}
+
+.neon-text {
+  color: #00E5FF;
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.8);
+}
+
+.neon-border {
+  border-color: rgba(0, 229, 255, 0.5);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+}
+
+.btn-primary {
+  position: relative;
+  padding: 0.75rem 2rem;
+  border-radius: 9999px;
+  font-weight: 500;
+  overflow: hidden;
+  transition: all 0.3s;
+  background: linear-gradient(to right, #06b6d4, #9333ea);
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(0, 229, 255, 0.5);
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+
+.digital-grid {
+  background-image: linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
