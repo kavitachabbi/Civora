@@ -6,13 +6,26 @@ import { cn } from '../../lib/utils';
 interface RouteEngineProps {
   isNavigating: boolean;
   start: string;
+  setStart: (val: string) => void;
   dest: string;
+  setDest: (val: string) => void;
   speed: number;
   eta: string;
   distance: string;
+  onToggleNavigation: () => void;
 }
 
-export default function RouteEngine({ isNavigating, start, dest, speed, eta, distance }: RouteEngineProps) {
+export default function RouteEngine({ 
+  isNavigating, 
+  start, 
+  setStart, 
+  dest, 
+  setDest, 
+  speed, 
+  eta, 
+  distance,
+  onToggleNavigation 
+}: RouteEngineProps) {
   return (
     <div className="cyber-card space-y-6">
       <div className="flex items-center gap-2">
@@ -42,13 +55,27 @@ export default function RouteEngine({ isNavigating, start, dest, speed, eta, dis
             <div className="w-3 h-3 bg-purple-500 rounded-sm" />
           </div>
           <div className="flex-grow space-y-3">
-            <div className="p-3 bg-white/5 rounded-xl border border-white/5">
-              <div className="text-[8px] uppercase tracking-widest text-white/30 mb-1">Origin</div>
-              <div className="text-xs font-bold text-white/80">{start}</div>
+            <div className="relative">
+              <input 
+                type="text"
+                value={start}
+                onChange={(e) => setStart(e.target.value)}
+                disabled={isNavigating}
+                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white/80 focus:outline-none focus:neon-border transition-all disabled:opacity-50"
+                placeholder="Origin"
+              />
+              <div className="absolute -top-2 left-3 bg-[#06142E] px-1 text-[8px] uppercase tracking-widest text-white/30">Origin</div>
             </div>
-            <div className="p-3 bg-white/5 rounded-xl border border-white/5">
-              <div className="text-[8px] uppercase tracking-widest text-white/30 mb-1">Destination</div>
-              <div className="text-xs font-bold text-white/80">{dest}</div>
+            <div className="relative">
+              <input 
+                type="text"
+                value={dest}
+                onChange={(e) => setDest(e.target.value)}
+                disabled={isNavigating}
+                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white/80 focus:outline-none focus:neon-border transition-all disabled:opacity-50"
+                placeholder="Destination"
+              />
+              <div className="absolute -top-2 left-3 bg-[#06142E] px-1 text-[8px] uppercase tracking-widest text-white/30">Destination</div>
             </div>
           </div>
         </div>
@@ -84,10 +111,13 @@ export default function RouteEngine({ isNavigating, start, dest, speed, eta, dis
         <div className="text-2xl font-mono font-black text-green-400">98</div>
       </div>
 
-      <button className={cn(
-        "w-full py-4 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2 transition-all",
-        isNavigating ? "bg-red-500/20 text-red-400 border border-red-500/30" : "btn-primary"
-      )}>
+      <button 
+        onClick={onToggleNavigation}
+        className={cn(
+          "w-full py-4 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2 transition-all",
+          isNavigating ? "bg-red-500/20 text-red-400 border border-red-500/30" : "btn-primary"
+        )}
+      >
         {isNavigating ? "Terminate Navigation" : "Initiate Smart Route"}
       </button>
     </div>

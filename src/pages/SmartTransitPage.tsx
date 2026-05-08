@@ -78,6 +78,8 @@ const TREND_DATA = [
 export default function SmartTransitPage() {
   const navigate = useNavigate();
   const [isNavigating, setIsNavigating] = useState(false);
+  const [startLocation, setStartLocation] = useState('Smart City Hub');
+  const [destination, setDestination] = useState('Green Tech District');
   const [currentSpeed, setCurrentSpeed] = useState(0);
   const [detectedPotholes, setDetectedPotholes] = useState<any[]>([]);
   const [emergencyAlert, setEmergencyAlert] = useState<string | null>(null);
@@ -206,11 +208,14 @@ export default function SmartTransitPage() {
           <div className="lg:col-span-3 space-y-6 overflow-y-auto max-h-[85vh] custom-scrollbar pr-2">
             <RouteEngine 
               isNavigating={isNavigating}
-              start="Smart City Hub"
-              dest="Green Tech District"
+              start={startLocation}
+              setStart={setStartLocation}
+              dest={destination}
+              setDest={setDestination}
               speed={currentSpeed}
               eta="12:45 PM"
               distance="3.2 KM"
+              onToggleNavigation={() => setIsNavigating(!isNavigating)}
             />
             <WeatherPanel />
             <div className="cyber-card">
